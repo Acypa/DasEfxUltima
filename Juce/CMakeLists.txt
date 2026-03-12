@@ -61,7 +61,7 @@ cmake_dependent_option(JUCE_ENABLE_MODULE_SOURCE_GROUPS
     "Show all module sources in IDE projects" OFF
     "NOT JUCE_MODULES_ONLY" OFF)
 
-add_subdirectory(JUCE)
+add_subdirectory(modules)
 
 if(JUCE_MODULES_ONLY)
     return()
@@ -185,4 +185,5 @@ if(("${CMAKE_SOURCE_DIR}" STREQUAL "${JUCE_SOURCE_DIR}") AND (NOT JUCE_BUILD_HEL
         install(EXPORT LV2_HELPER NAMESPACE juce:: DESTINATION "${JUCE_INSTALL_DESTINATION}")
     endif()
 endif()
+
 
