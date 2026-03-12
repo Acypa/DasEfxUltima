@@ -1,140 +1,93 @@
-#include "PluginProcessor.h"
+#pragma once
+#include <JuceHeader.h>
 
-DasEfxUltimaProcessor::DasEfxUltimaProcessor()
-    : AudioProcessor(BusesProperties()
-        .withInput("Input", juce::AudioChannelSet::stereo(), true)
-        .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
-      apvts(*this, nullptr, "Parameters", createParameterLayout())
-{
-}
+// ================= ZDF FILTER =================
+class ZDFFilter {
+public:
+    enum Type { LowPass, HighPass, Bell };
 
-DasEfxUltimaProcessor::~DasEfxUltimaProcessor() {}
-
-juce::AudioProcessorValueTreeState::ParameterLayout
-DasEfxUltimaProcessor::createParameterLayout()
-{
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
-
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
-        "monitorMix", "Monitor Mix", 0.0f, 1.0f, 0.5f));
-
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
-        "gateThresh", "Gate Threshold", -60.0f, 0.0f, -45.0f));
-
-    params.push_back(std::make_unique<juce::AudioParameterFloat>(
-        "drive", "Analog Drive", 1.0f, 3.0f, 1.4f));
-
-    return { params.begin(), params.end() };
-}
-
-void DasEfxUltimaProcessor::prepareToPlay(double sampleRate, int)
-{
-    hpf.setParams(125.0f, 0.707f, (float)sampleRate, ZDFFilter::HighPass);
-    bell.setParams(2850.0f, 1.3f, (float)sampleRate, ZDFFilter::Bell, 5.0f);
-    lpf.setParams(14200.0f, 0.85f, (float)sampleRate, ZDFFilter::LowPass);
-
-    const float attackTime = 0.01f;   // 10 ms
-    const float releaseTime = 0.15f;  // 150 ms
-
-    attackCoeff  = std::exp(-1.0f / (sampleRate * attackTime));
-    releaseCoeff = std::exp(-1.0f / (sampleRate * releaseTime));
-}
-
-void DasEfxUltimaProcessor::processBlock(juce::AudioBuffer<float>& buffer,
-                                         juce::MidiBuffer&)
-{
-    juce::ScopedNoDenormals noDenormals;
-
-    const float monitorMix = *apvts.getRawParameterValue("monitorMix");
-    const float gateDB     = *apvts.getRawParameterValue("gateThresh");
-    const float drive      = *apvts.getRawParameterValue("drive");
-
-    const float gateThreshold = juce::Decibels::decibelsToGain(gateDB);
-    const float targetLevel   = 0.6f;
-
-    float rmsAccum = 0.0f;
-    int totalSamples = 0;
-
-    for (int channel = 0; channel < getTotalNumInputChannels(); ++channel)
+    void setParams(float freq, float res, float sampleRate, Type t, float gainDB = 0.0f)
     {
-        auto* channelData = buffer.getWritePointer(channel);
+        float g = std::tan(juce::MathConstants<float>::pi * freq / sampleRate);
+        float k = 1.0f / res;
+        float gainLinear = std::pow(10.0f, gainDB / 20.0f);
 
-        for (int i = 0; i < buffer.getNumSamples(); ++i)
-        {
-            float cleanSig = channelData[i];
-            float x = cleanSig;
+        a1 = 1.0f / (1.0f + g * (g + k));
+        a2 = g * a1;
+        a3 = g * a2;
 
-            // 1. Soft Gate
-            if (std::abs(x) < gateThreshold)
-                x *= 0.02f;
-
-            // 2. Envelope follower
-            float rectified = std::abs(x);
-
-            if (rectified > envelope)
-                envelope = attackCoeff * (envelope - rectified) + rectified;
-            else
-                envelope = releaseCoeff * (envelope - rectified) + rectified;
-
-            // 3. Auto Gain
-            float gain = (envelope > 0.001f) ? (targetLevel / envelope) : 1.0f;
-            gain = juce::jlimit(0.5f, 3.0f, gain);
-
-            x *= gain;
-
-            // 4. Saturation
-            x = std::tanh(x * drive);
-
-            // 5. ZDF EQ
-            x = hpf.process(x);
-            x = bell.process(x);
-            x = lpf.process(x);
-
-            // 6. 12-bit crunch
-            x = std::round(x * 4096.0f) / 4096.0f;
-
-            // 7. Soft Clip
-            x = juce::jlimit(-0.98f, 0.98f, x);
-
-            float processed = x * 0.8f;
-            float finalOut =
-                (processed * (1.0f - monitorMix)) +
-                (cleanSig  * monitorMix);
-
-            channelData[i] = finalOut;
-
-            rmsAccum += finalOut * finalOut;
-            totalSamples++;
-        }
+        type = t;
+        this->g = g;
+        this->k = k;
+        this->gain = gainLinear;
     }
 
-    float rms = std::sqrt(rmsAccum / (float)juce::jmax(1, totalSamples));
-    rmsLevel.set(rms);
-}
+    float process(float x)
+    {
+        float v3 = x - s2;
+        float v1 = a1 * s1 + a2 * v3;
+        float v2 = s2 + a2 * s1 + a3 * v3;
 
-void DasEfxUltimaProcessor::getStateInformation(juce::MemoryBlock& destData)
+        s1 = 2.0f * v1 - s1;
+        s2 = 2.0f * v2 - s2;
+
+        if (type == LowPass)  return v2;
+        if (type == HighPass) return x - k * v1 - v2;
+        if (type == Bell)     return x + k * (gain - 1.0f) * v1;
+
+        return x;
+    }
+
+private:
+    float s1 = 0.0f, s2 = 0.0f;
+    float a1 = 0.0f, a2 = 0.0f, a3 = 0.0f;
+    float g = 0.0f, k = 0.0f, gain = 1.0f;
+    Type type = LowPass;
+};
+
+// ================= PROCESSOR =================
+class DasEfxUltimaProcessor : public juce::AudioProcessor
 {
-    auto state = apvts.copyState();
-    std::unique_ptr<juce::XmlElement> xml(state.createXml());
-    copyXmlToBinary(*xml, destData);
-}
+public:
+    DasEfxUltimaProcessor();
+    ~DasEfxUltimaProcessor() override;
 
-void DasEfxUltimaProcessor::setStateInformation(const void* data, int sizeInBytes)
-{
-    std::unique_ptr<juce::XmlElement> xmlState(
-        getXmlFromBinary(data, sizeInBytes));
+    void prepareToPlay(double sampleRate, int samplesPerBlock) override;
+    void releaseResources() override {}
+    void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
-    if (xmlState != nullptr)
-        apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
-}
+    juce::AudioProcessorEditor* createEditor() override;
+    bool hasEditor() const override { return true; }
 
-juce::AudioProcessorEditor*
-DasEfxUltimaProcessor::createEditor()
-{
-    return new juce::GenericAudioProcessorEditor(*this);
-}
+    const juce::String getName() const override { return "Das EFX 1993 Studio"; }
 
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new DasEfxUltimaProcessor();
-}
+    bool acceptsMidi() const override { return false; }
+    bool producesMidi() const override { return false; }
+    double getTailLengthSeconds() const override { return 0.0; }
+
+    int getNumPrograms() override { return 1; }
+    int getCurrentProgram() override { return 0; }
+    void setCurrentProgram(int) override {}
+    const juce::String getProgramName(int) override { return {}; }
+    void changeProgramName(int, const juce::String&) override {}
+
+    void getStateInformation(juce::MemoryBlock& destData) override;
+    void setStateInformation(const void* data, int sizeInBytes) override;
+
+    float getLevel() const { return rmsLevel.get(); }
+
+private:
+    juce::AudioProcessorValueTreeState apvts;
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    ZDFFilter hpf, lpf, bell;
+
+    // Envelope auto-gain
+    float envelope = 0.0f;
+    float attackCoeff = 0.0f;
+    float releaseCoeff = 0.0f;
+
+    juce::Atomic<float> rmsLevel { 0.0f };
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DasEfxUltimaProcessor)
+};
