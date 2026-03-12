@@ -1,4 +1,4 @@
-name: Build VST3
+name: Build VST3 + Installer
 
 on:
   push:
@@ -19,12 +19,17 @@ jobs:
     - name: Configure CMake
       run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64
 
-    - name: Build
+    - name: Build Plugin
       run: cmake --build build --config Release
 
-    - name: Upload Artifact
+    - name: Install Inno Setup
+      run: choco install innosetup --yes
+
+    - name: Build Installer
+      run: iscc installer.iss
+
+    - name: Upload Installer
       uses: actions/upload-artifact@v4
       with:
-        name: DasEfxUltima-VST3
-
-        path: build/DasEfxUltima_artefacts/Release/VST3/*.vst3
+        name: DasEfxUltimaInstaller
+        path: Output/*.exe
