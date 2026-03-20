@@ -56,7 +56,7 @@ include(extras/Build/CMake/JUCEModuleSupport.cmake)
 # probably also add `set_property(GLOBAL PROPERTY USE_FOLDERS YES)` to your top level CMakeLists,
 # otherwise the module sources will be added directly to the top level of the project, instead of in
 # a nice 'Modules' subfolder.
-add_subdirectory(JUCE)
+
 target_link_libraries(DasEfxUltima PRIVATE juce::juce_audio_processors)
 target_include_directories(DasEfxUltima PRIVATE ${JUCE_DIR}/modules)
 
