@@ -3,9 +3,6 @@ project(DasEfxUltima VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_subdirectory(JUCE
-EXCLUDE_FROM_ALL)
-
 juce_add_plugin(DasEfxUltima
     COMPANY_NAME "Boss Audio"
     IS_SYNTH FALSE
@@ -17,12 +14,13 @@ juce_add_plugin(DasEfxUltima
     PLUGIN_MANUFACTURER_CODE Boss
     PLUGIN_CODE DFX1
     FORMATS VST3
-    PRODUCT_NAME "Das EFX 1993 Studio")
-juce_generate_juce_header(DasEfxUltima)    
+    PRODUCT_NAME "Das EFX 1993 Studio")   
 
 target_sources(DasEfxUltima PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginProcessor.h)
+
+juce_generate_juce_header(DasEfxUltima) 
 
 target_link_libraries(DasEfxUltima
     PRIVATE
