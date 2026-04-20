@@ -8,7 +8,7 @@ add_subdirectory(JUCE)
 juce_add_plugin(DasEfxUltima
     COMPANY_NAME "Boss Audio"
     IS_SYNTH FALSE
-    NEEDS_MIDI_INPUT FALSE
+    NEEDS_MIDI_INPUT FAtLSE
     NEEDS_MIDI_OUTPUT FALSE
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
@@ -16,6 +16,8 @@ juce_add_plugin(DasEfxUltima
     PLUGIN_MANUFACTURER_CODE Boss
     PLUGIN_CODE DFX1
     FORMATS VST3
+    VST2_CATEGORY
+    JucePlugin_VstCategory_Undefined
     PRODUCT_NAME "Das EFX 1993 Studio")   
 
 target_sources(DasEfxUltima PRIVATE
