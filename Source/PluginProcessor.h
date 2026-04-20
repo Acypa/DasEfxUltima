@@ -1,5 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
+#define JucePlugin_Build_VST 0
 
 // ================= ZDF FILTER =================
 class ZDFFilter {
