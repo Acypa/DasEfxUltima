@@ -13,7 +13,7 @@ DasEfxUltimaProcessor::~DasEfxUltimaProcessor() {}
 juce::AudioProcessorValueTreeState::ParameterLayout
 DasEfxUltimaProcessor::createParameterLayout()
 {
-    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+    std::vector<std::unique_ptr<juce::RangedAudioParameter> > params;
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>(
         "monitorMix", "Monitor Mix", 0.0f, 1.0f, 0.5f));
