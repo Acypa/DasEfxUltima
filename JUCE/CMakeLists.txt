@@ -58,7 +58,7 @@ include(extras/Build/CMake/JUCEModuleSupport.cmake)
 # a nice 'Modules' subfolder.
 
 
-target_include_directories(DasEfxUltima PRIVATE ${JUCE_DIR}/modules)
+
 
 cmake_dependent_option(JUCE_ENABLE_MODULE_SOURCE_GROUPS
     "Show all module sources in IDE projects" OFF
