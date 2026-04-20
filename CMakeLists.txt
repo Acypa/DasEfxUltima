@@ -24,5 +24,6 @@ target_sources(DasEfxUltima PRIVATE
 
 target_link_libraries(DasEfxUltima
     PRIVATE
+        juce::juce_audio_processors
         juce::juce_audio_utils
         juce::juce_dsp)
