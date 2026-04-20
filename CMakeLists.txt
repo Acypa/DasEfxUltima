@@ -3,6 +3,8 @@ project(DasEfxUltima VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
+add_subdirectory(JUCE)
+
 juce_add_plugin(DasEfxUltima
     COMPANY_NAME "Boss Audio"
     IS_SYNTH FALSE
