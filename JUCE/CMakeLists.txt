@@ -57,7 +57,7 @@ include(extras/Build/CMake/JUCEModuleSupport.cmake)
 # otherwise the module sources will be added directly to the top level of the project, instead of in
 # a nice 'Modules' subfolder.
 
-target_link_libraries(DasEfxUltima PRIVATE juce::juce_audio_processors)
+
 target_include_directories(DasEfxUltima PRIVATE ${JUCE_DIR}/modules)
 
 cmake_dependent_option(JUCE_ENABLE_MODULE_SOURCE_GROUPS
