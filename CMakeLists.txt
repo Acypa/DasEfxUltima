@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 set(JucePlugin_Build_VST 0)
 set(JucePlugin_Build_VST3 1)
 project(DasEfxUltima VERSION 1.0.1)
+set(JUCE_VST3_CAN_REPLACE_VST2 0)
+add_definitions(-DJUCE_VST3_CAN_REPLACE_VST2=0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -18,7 +20,7 @@ juce_add_plugin(DasEfxUltima
     COPY_PLUGIN_AFTER_BUILD FALSE
     PLUGIN_MANUFACTURER_CODE Boss
     PLUGIN_CODE EFX9
-    FORMATS VST3 AU
+    FORMATS VST3
     
     JUCE_VST2_CAN_REPLACE_VST3 OFF
     JUCE_VST3_CAN_REPLACE_VST2 OFF
