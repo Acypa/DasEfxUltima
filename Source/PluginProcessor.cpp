@@ -64,10 +64,6 @@ void DasEfxUltimaProcessor::processBlock(juce::AudioBuffer<float>& buffer,
             float cleanSig = channelData[i];
             float x = cleanSig;
 
-            // 1. Soft Gate
-            if (std::abs(x) < gateThreshold)
-                x *= 0.02f;
-
            // 1. Умный Гейт со сглаживанием
 float gateGain = (std::abs(x) > gateThreshold) ? 1.0f : 0.02f;
 
