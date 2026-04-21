@@ -68,8 +68,16 @@ void DasEfxUltimaProcessor::processBlock(juce::AudioBuffer<float>& buffer,
             if (std::abs(x) < gateThreshold)
                 x *= 0.02f;
 
-            // 2. Envelope follower
-            float rectified = std::abs(x);
+           // 1. Умный Гейт со сглаживанием
+float gateGain = (std::abs(x) > gateThreshold) ? 1.0f : 0.02f;
+
+// Используем огибающую для плавного закрытия (Release)
+if (gateGain < currentGateLevel)
+    currentGateLevel = releaseCoeff * (currentGateLevel - gateGain) + gateGain;
+else
+    currentGateLevel = gateGain; // Открываем мгновенно (Attack)
+
+x *= currentGateLevel;
 
             if (rectified > envelope)
                 envelope = attackCoeff * (envelope - rectified) + rectified;
