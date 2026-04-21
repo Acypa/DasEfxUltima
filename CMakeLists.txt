@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.15)
 set(JucePlugin_Build_VST 0)
 set(JucePlugin_Build_VST3 1)
 project(DasEfxUltima VERSION 1.0.1)
+
+if(MSVC)
+    # Это заставит ВЕСЬ проект, включая JUCE, использовать статическую линковку
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    add_definitions(-D_MT)
+endif()
+
 set(JUCE_VST3_CAN_REPLACE_VST2 0)
 add_definitions(-DJUCE_VST3_CAN_REPLACE_VST2=0)
 
@@ -25,16 +32,6 @@ juce_add_plugin(DasEfxUltima
     
     PRODUCT_NAME "DasEfxUltima")  
 
-if(MSVC)
-    # Глобально принуждаем использовать статическую линковку
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    
-    # Твои предыдущие настройки
-    set_target_properties(DasEfxUltima PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
-    target_compile_options(DasEfxUltima PRIVATE /MT)
-    set_property(TARGET DasEfxUltima PROPERTY INTERFACE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
-endif()
-
 target_sources(DasEfxUltima PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginProcessor.h)
@@ -46,4 +43,5 @@ target_link_libraries(DasEfxUltima
         juce::juce_audio_processors
         juce::juce_audio_utils
         juce::juce_dsp)
+        
 set_target_properties(DasEfxUltima PROPERTIES JUCE_VST2_CAN_REPLACE_VST3 OFF)
