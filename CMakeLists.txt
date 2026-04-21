@@ -18,8 +18,9 @@ juce_add_plugin(DasEfxUltima
     PLUGIN_MANUFACTURER_CODE Boss
     PLUGIN_CODE DFX2
     FORMATS VST3
-    JUCE_VST2_CAN_REPLACE_VST3 FALSE
-    JUCE_VST3_CAN_REPLACE_VST2 FALSE
+    NEEDS_VST2 FALSE
+    JUCE_VST2_CAN_REPLACE_VST3 OFF
+    JUCE_VST3_CAN_REPLACE_VST2 OFF
     VST2_CATEGORY
     JucePlugin_VstCategory_Undefined
     PRODUCT_NAME "Das EFX 1993 Studio")   
@@ -35,3 +36,4 @@ target_link_libraries(DasEfxUltima
         juce::juce_audio_processors
         juce::juce_audio_utils
         juce::juce_dsp)
+set_target_properties(DasEfxUltima PROPERTIES JUCE_VST2_CAN_REPLACE_VST3 OFF)
