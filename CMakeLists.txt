@@ -22,9 +22,6 @@ juce_add_plugin(DasEfxUltima
     PLUGIN_CODE EFX9
     FORMATS VST3
     
-    JUCE_VST2_CAN_REPLACE_VST3 OFF
-    JUCE_VST3_CAN_REPLACE_VST2 OFF
-    
     PRODUCT_NAME "DasEfxUltima")   
 
 target_sources(DasEfxUltima PRIVATE
