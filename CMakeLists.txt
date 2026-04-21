@@ -9,16 +9,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(JUCE)
 
-if(MSVC)
-    # Глобально принуждаем использовать статическую линковку
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    
-    # Твои предыдущие настройки
-    set_target_properties(DasEfxUltima PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
-    target_compile_options(DasEfxUltima PRIVATE /MT)
-    set_property(TARGET DasEfxUltima PROPERTY INTERFACE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
-endif()
-
 set(JUCE_COPY_PLUGIN_AFTER_BUILD OFF)
 juce_add_plugin(DasEfxUltima
     COMPANY_NAME "Boss Audio"
@@ -33,7 +23,17 @@ juce_add_plugin(DasEfxUltima
     PLUGIN_CODE EFX9
     FORMATS VST3
     
-    PRODUCT_NAME "DasEfxUltima")   
+    PRODUCT_NAME "DasEfxUltima")  
+
+if(MSVC)
+    # Глобально принуждаем использовать статическую линковку
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    
+    # Твои предыдущие настройки
+    set_target_properties(DasEfxUltima PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    target_compile_options(DasEfxUltima PRIVATE /MT)
+    set_property(TARGET DasEfxUltima PROPERTY INTERFACE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+endif()
 
 target_sources(DasEfxUltima PRIVATE
     Source/PluginProcessor.cpp
