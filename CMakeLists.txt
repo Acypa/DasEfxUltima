@@ -36,3 +36,7 @@ target_link_libraries(DasEfxUltima
         juce::juce_audio_utils
         juce::juce_dsp)
 set_target_properties(DasEfxUltima PROPERTIES JUCE_VST2_CAN_REPLACE_VST3 OFF)
+if(MSVC)
+    set_target_properties(DasEfxUltima PROPERTIES 
+        MSVC_RUNTIME_LIBRARY "MultiThreaded")
+endif()
