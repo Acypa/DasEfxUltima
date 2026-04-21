@@ -22,6 +22,7 @@ endif()
 set(JUCE_COPY_PLUGIN_AFTER_BUILD OFF)
 juce_add_plugin(DasEfxUltima
     COMPANY_NAME "Boss Audio"
+    BUNDLE_ID "com.boss.audio"
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE
