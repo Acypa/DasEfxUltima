@@ -66,7 +66,7 @@ void DasEfxUltimaProcessor::processBlock(juce::AudioBuffer<float>& buffer,
             float x = cleanSig;
 
            // 1. Умный Гейт со сглаживанием
-float gateGain = (std::abs(x) > gateThreshold) ? 1.0f : 0.02f;
+float gateGain = (fabsf(x) > gateThreshold) ? 1.0f : 0.02f;
 
 // Используем огибающую для плавного закрытия (Release)
 if (gateGain < currentGateLevel)
