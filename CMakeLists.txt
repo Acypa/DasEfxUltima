@@ -37,6 +37,10 @@ target_link_libraries(DasEfxUltima
         juce::juce_dsp)
 set_target_properties(DasEfxUltima PROPERTIES JUCE_VST2_CAN_REPLACE_VST3 OFF)
 if(MSVC)
+    # Это заставит плагин вшить все нужные библиотеки Microsoft внутрь себя
     set_target_properties(DasEfxUltima PROPERTIES 
         MSVC_RUNTIME_LIBRARY "MultiThreaded")
+    
+    # Дополнительная проверка, чтобы точно сработало
+    target_compile_options(DasEfxUltima PRIVATE /MT)
 endif()
