@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(JUCE)
 
+set(JUCE_COPY_PLUGIN_AFTER_BUILD OFF)
 juce_add_plugin(DasEfxUltima
     COMPANY_NAME "Boss Audio"
     IS_SYNTH FALSE
@@ -21,9 +22,8 @@ juce_add_plugin(DasEfxUltima
     NEEDS_VST2 FALSE
     JUCE_VST2_CAN_REPLACE_VST3 OFF
     JUCE_VST3_CAN_REPLACE_VST2 OFF
-    VST2_CATEGORY
-    JucePlugin_VstCategory_Undefined
-    PRODUCT_NAME "Das EFX 1993 Studio")   
+    
+    PRODUCT_NAME "DasEfxUltima")   
 
 target_sources(DasEfxUltima PRIVATE
     Source/PluginProcessor.cpp
