@@ -43,6 +43,7 @@ private:
     float s1 = 0.0f, s2 = 0.0f;
     float a1 = 0.0f, a2 = 0.0f, a3 = 0.0f;
     float g = 0.0f, k = 0.0f, gain = 1.0f;
+    float currentGateLevel = 1.0f;
     Type type = LowPass;
 };
 
