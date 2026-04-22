@@ -30,13 +30,12 @@ juce_add_plugin(DasEfxUltima
     set_target_properties(DasEfxUltima PROPERTIES JUCE_VST3_GENERATE_MANIFEST OFF)
 
     if(MSVC)
-    # Это заставит ВЕСЬ проект, включая JUCE, использовать статическую линковку
+    # Это заставит проект использовать статические библиотеки (/MT), а не динамические (/MD)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    
     add_definitions(-D_MT)
-endif()
-
-    # Отключаем генерацию манифеста, которая вешает билд на GitHub
-if(NOT CMAKE_CURRENT_BINARY_DIR MATCHES "build") 
+    
+    # Принудительно отключаем генерацию манифеста, чтобы билд на GitHub не падал
     set_target_properties(DasEfxUltima PROPERTIES JUCE_VST3_GENERATE_MANIFEST OFF)
 endif()
 
