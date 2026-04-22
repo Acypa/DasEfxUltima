@@ -4,6 +4,11 @@
 
 // ================= ZDF FILTER =================
 class ZDFFilter {
+private:
+    float envelope = 0.0f;
+    float attackCoeff = 0.0f;
+    float releaseCoeff = 0.0f;
+    float currentGateLevel = 1.0f;
 public:
     enum Type { LowPass, HighPass, Bell };
 
