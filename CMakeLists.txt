@@ -32,8 +32,12 @@ juce_add_plugin(DasEfxUltima
     PLUGIN_MANUFACTURER_CODE Boss
     PLUGIN_CODE EFX9
     FORMATS VST3
+    PRODUCT_NAME "DasEfxUltima") 
     
-    PRODUCT_NAME "DasEfxUltima")  
+    # Отключаем генерацию манифеста, которая вешает билд на GitHub
+if(NOT CMAKE_CURRENT_BINARY_DIR MATCHES "build") 
+    set_target_properties(DasEfxUltima PROPERTIES JUCE_VST3_GENERATE_MANIFEST OFF)
+endif()
 
 target_sources(DasEfxUltima PRIVATE
     Source/PluginProcessor.cpp
