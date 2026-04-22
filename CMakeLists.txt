@@ -17,9 +17,12 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(JUCE)
 
 set(JUCE_COPY_PLUGIN_AFTER_BUILD OFF)
+
 juce_add_plugin(DasEfxUltima
+
     COMPANY_NAME "Boss Audio"
     BUNDLE_ID "com.boss.audio"
+    set_target_properties(DasEfxUltima PROPERTIES JUCE_VST3_GENERATE_MANIFEST OFF)
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE
