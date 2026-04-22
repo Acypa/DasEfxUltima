@@ -3,11 +3,6 @@ set(JucePlugin_Build_VST 0)
 set(JucePlugin_Build_VST3 1)
 project(DasEfxUltima VERSION 1.0.1)
 
-if(MSVC)
-    # Это заставит ВЕСЬ проект, включая JUCE, использовать статическую линковку
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-    add_definitions(-D_MT)
-endif()
 
 set(JUCE_VST3_CAN_REPLACE_VST2 0)
 add_definitions(-DJUCE_VST3_CAN_REPLACE_VST2=0)
@@ -22,7 +17,6 @@ juce_add_plugin(DasEfxUltima
 
     COMPANY_NAME "Boss Audio"
     BUNDLE_ID "com.boss.audio"
-    set_target_properties(DasEfxUltima PROPERTIES JUCE_VST3_GENERATE_MANIFEST OFF)
     IS_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     NEEDS_MIDI_OUTPUT FALSE
@@ -33,7 +27,14 @@ juce_add_plugin(DasEfxUltima
     PLUGIN_CODE EFX9
     FORMATS VST3
     PRODUCT_NAME "DasEfxUltima") 
-    
+    set_target_properties(DasEfxUltima PROPERTIES JUCE_VST3_GENERATE_MANIFEST OFF)
+
+    if(MSVC)
+    # Это заставит ВЕСЬ проект, включая JUCE, использовать статическую линковку
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    add_definitions(-D_MT)
+endif()
+
     # Отключаем генерацию манифеста, которая вешает билд на GitHub
 if(NOT CMAKE_CURRENT_BINARY_DIR MATCHES "build") 
     set_target_properties(DasEfxUltima PROPERTIES JUCE_VST3_GENERATE_MANIFEST OFF)
