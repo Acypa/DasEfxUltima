@@ -75,11 +75,13 @@ else
     currentGateLevel = gateGain; // Открываем мгновенно (Attack)
 
 x *= currentGateLevel;
+// Calculate the rectified (absolute) value
+float rectified = fabsf(x);
 
-            if (rectified > envelope)
-                envelope = attackCoeff * (envelope - rectified) + rectified;
-            else
-                envelope = releaseCoeff * (envelope - rectified) + rectified;
+if (rectified > envelope)
+    envelope = attackCoeff * (envelope - rectified) + rectified;
+else
+    envelope = releaseCoeff * (envelope - rectified) + rectified;
 
             // 3. Auto Gain
             float gain = (envelope > 0.001f) ? (targetLevel / envelope) : 1.0f;
