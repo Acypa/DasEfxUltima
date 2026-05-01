@@ -68,28 +68,28 @@ void DasEfxUltimaProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce:
             float cleanSig = channelData[i];
             float x = cleanSig;
 
-            // 1. Умный Гейт (плавный, ч��обы не "жевать")
-float gateTarget = (fabsf(x) > gateThreshold) ? 1.0f : 0.001f;
-float currentGate = currentGateLevel.load();
-if (gateTarget > currentGate)
-    currentGate += attackCoeff * (gateTarget - currentGate);
-else
-    currentGate += releaseCoeff * (gateTarget - currentGate);
-currentGateLevel.store(currentGate);
+            // 1. Умный Гейт (плавный, чтобы не "жевать")
+            float gateTarget = (fabsf(x) > gateThreshold) ? 1.0f : 0.001f;
+            float currentGate = currentGateLevel.load();
+            if (gateTarget > currentGate)
+                currentGate += attackCoeff * (gateTarget - currentGate);
+            else
+                currentGate += releaseCoeff * (gateTarget - currentGate);
+            currentGateLevel.store(currentGate);
+            
+            x *= currentGate;
 
-x *= currentGate;
-
-// 2. Детектор огибающей для Auto-функции
-float rectified = fabsf(x);
-float env = envelope.load();
-if (rectified > env)
-    env += attackCoeff * (rectified - env);
-else
-    env += releaseCoeff * (rectified - env);
-envelope.store(env);
+            // 2. Детектор огибающей для Auto-функций
+            float rectified = fabsf(x);
+            float env = envelope.load();
+            if (rectified > env)
+                env += attackCoeff * (rectified - env);
+            else
+                env += releaseCoeff * (rectified - env);
+            envelope.store(env);
 
             // 3. Auto Gain (нормализация перед EQ)
-            float gain = (envelope > 0.001f) ? (0.6f / envelope) : 1.0f;
+            float gain = (env > 0.001f) ? (0.6f / env) : 1.0f;
             x *= juce::jlimit(0.5f, 2.5f, gain);
 
             // 4. Динамическая логика CFO (наш "Радар")
@@ -98,8 +98,8 @@ envelope.store(env);
 
             if (isAuto) {
                 // Автомат ищет яд в районе 3кГц и давит пропорционально энергии
-                targetFreq = 2850.0f + (envelope * 500.0f); 
-                targetGain = -6.0f * envelope * intensity; 
+                targetFreq = 2850.0f + (env * 500.0f); 
+                targetGain = -6.0f * env * intensity; 
             }
             
             if (isManual) {
