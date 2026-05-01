@@ -83,6 +83,11 @@ void DasEfxUltimaProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce:
                 envelope += attackCoeff * (rectified - envelope);
             else
                 envelope += releaseCoeff * (rectified - envelope);
+            
+            // Используй .load(), чтобы достать значение из атомика
+auto levelValue = rmsLevel.get(); 
+// Или, если ты выводишь это в лог:
+someString += juce::String(levelValue);
 
             // 3. Auto Gain (нормализация перед EQ)
             float gain = (envelope > 0.001f) ? (0.6f / envelope) : 1.0f;
