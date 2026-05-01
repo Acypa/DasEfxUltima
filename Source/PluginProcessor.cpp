@@ -68,26 +68,25 @@ void DasEfxUltimaProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce:
             float cleanSig = channelData[i];
             float x = cleanSig;
 
-            // 1. Умный Гейт (плавный, чтобы не "жевать")
-            float gateTarget = (fabsf(x) > gateThreshold) ? 1.0f : 0.001f;
-            if (gateTarget > currentGateLevel)
-                currentGateLevel += attackCoeff * (gateTarget - currentGateLevel);
-            else
-                currentGateLevel += releaseCoeff * (gateTarget - currentGateLevel);
-            
-            x *= currentGateLevel;
+            // 1. Умный Гейт (плавный, ч��обы не "жевать")
+float gateTarget = (fabsf(x) > gateThreshold) ? 1.0f : 0.001f;
+float currentGate = currentGateLevel.load();
+if (gateTarget > currentGate)
+    currentGate += attackCoeff * (gateTarget - currentGate);
+else
+    currentGate += releaseCoeff * (gateTarget - currentGate);
+currentGateLevel.store(currentGate);
 
-            // 2. Детектор огибающей для Auto-функций
-            float rectified = fabsf(x);
-            if (rectified > envelope)
-                envelope += attackCoeff * (rectified - envelope);
-            else
-                envelope += releaseCoeff * (rectified - envelope);
-            
-            // Используй .load(), чтобы достать значение из атомика
-auto levelValue = rmsLevel.get(); 
-// Или, если ты выводишь это в лог:
-someString += juce::String(levelValue);
+x *= currentGate;
+
+// 2. Детектор огибающей для Auto-функции
+float rectified = fabsf(x);
+float env = envelope.load();
+if (rectified > env)
+    env += attackCoeff * (rectified - env);
+else
+    env += releaseCoeff * (rectified - env);
+envelope.store(env);
 
             // 3. Auto Gain (нормализация перед EQ)
             float gain = (envelope > 0.001f) ? (0.6f / envelope) : 1.0f;
